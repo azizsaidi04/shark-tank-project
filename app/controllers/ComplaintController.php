@@ -24,11 +24,21 @@ class ComplaintController extends Controller {
     }
     
     public function backoffice() {
-        // Récupérer toutes les réclamations depuis la base de données
-        $complaints = $this->complaintModel->getAllComplaints();
-        // Passer les réclamations à la vue
-        $this->view('backoffice/complaints_list', ['complaints' => $complaints]);
+        $filters = [
+            'status' => $_GET['status'] ?? '',
+            'title' => $_GET['title'] ?? '',
+            'date_filter' => $_GET['date_filter'] ?? '',
+            'sort_order' => $_GET['sort_order'] ?? 'desc'
+        ];
+    
+        $complaints = $this->complaintModel->getFilteredComplaints($filters);
+    
+        $this->view('backoffice/complaints_list', [
+            'complaints' => $complaints,
+            'filters' => $filters
+        ]);
     }
+    
     
 
 
@@ -132,7 +142,7 @@ class ComplaintController extends Controller {
 
             // Ajouter la réponse à la réclamation
             if ($this->complaintModel->addResponse($id, $response_text)) {
-                header('Location: index.php?action=index'); // Rediriger vers la liste des réclamations
+                header('Location: index.php?action=backoffice'); // Rediriger vers la liste des réclamations
             } else {
                 echo "Erreur lors de l'ajout de la réponse.";
             }
@@ -183,7 +193,7 @@ class ComplaintController extends Controller {
 
             if ($this->complaintModel->updateResponse($id, $responseText)) {
                 // Redirect to the complaint page after successful modification
-                header('Location: index.php?action=index&id=' . $response['complaint_id']);
+                header('Location: index.php?action=backoffice&id=' . $response['complaint_id']);
             } else {
                 echo "Error updating response.";
             }
@@ -199,7 +209,7 @@ class ComplaintController extends Controller {
         
         if ($this->complaintModel->deleteResponse($id)) {
             // Redirect to the complaint page after successful deletion
-            header('Location: index.php?action=index&id=' . $response['complaint_id']);
+            header('Location: index.php?action=backoffice&id=' . $response['complaint_id']);
         } else {
             echo "Error deleting response.";
         }

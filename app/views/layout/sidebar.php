@@ -39,6 +39,34 @@
             background-color: #ffffff;
             border: 1px solid #847C84;
         }
+
+        .input-field {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+
+        .btn-filter {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #ede9fe;
+            color: #4c1d95;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-filter:hover {
+            background-color: #c4b5fd;
+            color: white;
+        }
+
+        .btn-filter.active {
+            background-color: #7c3aed;
+            color: white;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100">

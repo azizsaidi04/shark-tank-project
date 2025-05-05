@@ -79,11 +79,30 @@ class Complaint {
     }
 
     public function addResponse($complaint_id, $response_text) {
-        $stmt = $this->conn->prepare("INSERT INTO responses (complaint_id, response_text) VALUES (?, ?)");
-        $stmt->execute([$complaint_id, $response_text]);
-        return $stmt->rowCount() > 0; // Retourne true si la réponse a été ajoutée
-    }
+        try {
+            // Démarrer une transaction
+            $this->conn->beginTransaction();
     
+            // 1. Ajouter la réponse
+            $stmt = $this->conn->prepare("INSERT INTO responses (complaint_id, response_text) VALUES (?, ?)");
+            $stmt->execute([$complaint_id, $response_text]);
+    
+            // 2. Mettre à jour le statut de la plainte
+            $update = $this->conn->prepare("UPDATE complaints SET status = 'closed' WHERE id = ?");
+            $update->execute([$complaint_id]);
+    
+            // Valider la transaction
+            $this->conn->commit();
+    
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            // En cas d'erreur, annuler la transaction
+            $this->conn->rollBack();
+            // Optionnel : journaliser ou afficher l'erreur
+            return false;
+        }
+    }
+        
     public function getResponsesByComplaintId($complaint_id) {
         $stmt = $this->conn->prepare("SELECT * FROM responses WHERE complaint_id = ?");
         $stmt->execute([$complaint_id]);
@@ -109,6 +128,43 @@ class Complaint {
         $stmt = $this->conn->prepare("DELETE FROM responses WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    public function getFilteredComplaints($filters) {
+        $query = "SELECT * FROM complaints WHERE 1=1";
+        $params = [];
+    
+        // Filtrer par statut
+        if (!empty($filters['status'])) {
+            $query .= " AND status = :status";
+            $params[':status'] = $filters['status'];
+        }
+    
+        // Filtrer par titre
+        if (!empty($filters['title'])) {
+            $query .= " AND title LIKE :title";
+            $params[':title'] = '%' . $filters['title'] . '%';
+        }
+    
+        // Filtrer par date
+        if (!empty($filters['date_filter'])) {
+            if ($filters['date_filter'] == 'today') {
+                $query .= " AND DATE(created_at) = CURDATE()";
+            } elseif ($filters['date_filter'] == 'last_week') {
+                $query .= " AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+            } elseif ($filters['date_filter'] == 'last_month') {
+                $query .= " AND created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
+            }
+        }
+    
+        // Tri par date
+        $sortOrder = strtoupper($filters['sort_order']) == 'ASC' ? 'ASC' : 'DESC';
+        $query .= " ORDER BY created_at $sortOrder";
+    
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     
 }
 ?>
