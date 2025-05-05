@@ -51,8 +51,8 @@
         <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion categories</a>
         <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion offres</a>
         <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion speechs</a>
-        <a href="index.php?action=index" class="block text-gray-700 hover:text-blue-500">Gestion Réclamations</a>
-        
+        <a href="index.php?action=backoffice" class="block text-gray-700 hover:text-blue-500">Gestion Réclamations</a>
+        <a href="index.php?action=index" class="block text-gray-700 hover:text-blue-500">Frontoffice</a>
       </nav>
     </aside>
 </body>

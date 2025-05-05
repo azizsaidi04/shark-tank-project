@@ -17,6 +17,8 @@ if (method_exists($controller, $action)) {
         $controller->$action($id);
     } else if ($action === 'delete_reply' && $id !== null) {
         $controller->$action($id);
+    } else if ($action === 'view_complaint_replies' && $id !== null) {
+        $controller->$action($id);
     } else {
         $controller->$action();
     }

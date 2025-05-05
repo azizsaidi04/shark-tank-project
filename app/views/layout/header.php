@@ -68,6 +68,7 @@
 <nav class="navbar p-4 flex justify-between items-center">
     <div class="text-xl font-bold">Complaint Management</div>
     <div>
+        <a href="index.php?action=backoffice">Backoffice</a>
         <a href="index.php?action=index">Mes Réclamations</a>
         <a href="index.php?action=add">Ajouter</a>
     </div>

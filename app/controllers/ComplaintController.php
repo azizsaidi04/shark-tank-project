@@ -23,6 +23,13 @@ class ComplaintController extends Controller {
         $this->view('frontoffice/complaints_list', ['complaints' => $complaints]);
     }
     
+    public function backoffice() {
+        // Récupérer toutes les réclamations depuis la base de données
+        $complaints = $this->complaintModel->getAllComplaints();
+        // Passer les réclamations à la vue
+        $this->view('backoffice/complaints_list', ['complaints' => $complaints]);
+    }
+    
 
 
     // Ajouter une réclamation
@@ -195,6 +202,22 @@ class ComplaintController extends Controller {
             header('Location: index.php?action=index&id=' . $response['complaint_id']);
         } else {
             echo "Error deleting response.";
+        }
+    }
+
+    public function view_complaint_replies($id) {
+
+        //get complaint details
+        $complaint = $this->complaintModel->getComplaintById($id)->fetch();
+
+        // Fetch the responses for the relevant complaint ID
+        $response = $this->complaintModel->getResponsesByComplaintId($id);
+
+        if ( $response !== null) {
+            // Redirect to the complaint page after successful deletion
+            $this->view('frontoffice/replies_list', ['replies' => $response, 'complaint' => $complaint]);
+        } else {
+            echo "There are no replies yet.";
         }
     }
 

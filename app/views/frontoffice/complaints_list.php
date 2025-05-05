@@ -8,6 +8,7 @@
             <p class="mb-2 text-[#847C84]"><?= nl2br(htmlspecialchars($complaint['description'])) ?></p>
             <div class="flex justify-between items-center mt-4">
                 <a href="index.php?action=edit&id=<?= $complaint['id'] ?>" class="btn-primary px-3 py-1 rounded">Modifier</a>
+                <a href="index.php?action=view_complaint_replies&id=<?= $complaint['id'] ?>" class="btn-primary px-3 py-1 rounded">Voir réponses</a>
                 <a href="index.php?action=delete&id=<?= $complaint['id'] ?>" class="btn-danger px-3 py-1 rounded" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</a>
             </div>
         </div>
