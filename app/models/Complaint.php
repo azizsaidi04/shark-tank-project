@@ -19,12 +19,13 @@ class Complaint {
 
 
     // Ajouter une réclamation
-    public function addComplaint($title, $description) {
-        $query = "INSERT INTO " . $this->table . " (title, description) VALUES (:title, :description)";
+    public function addComplaint($title, $description, $complaintTopic) {
+        $query = "INSERT INTO " . $this->table . " (title, description, topic) VALUES (:title, :description, :topic)";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':title', $title);
         $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':topic', $complaintTopic);
 
         if ($stmt->execute()) {
             return true;
@@ -164,7 +165,37 @@ class Complaint {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getStatistics() {
+        $query = "
+            SELECT 
+                COUNT(*) AS total_complaints,
+                SUM(status = 'open') AS open_complaints,
+                SUM(status = 'closed') AS closed_complaints,
+                DATE(created_at) AS date,
+                COUNT(*) AS complaints_per_day
+            FROM complaints
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at) DESC
+            LIMIT 7
+        ";
     
+        return $this->conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    
+    public function getComplaintsCountByTopic()
+    {
+        $stmt = $this->conn->query("SELECT topic, COUNT(*) as count FROM complaints GROUP BY topic");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getComplaintsCountByDate()
+    {
+        $stmt = $this->conn->query("SELECT DATE(created_at) as date, COUNT(*) as count FROM complaints GROUP BY DATE(created_at)");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     
 }
 ?>

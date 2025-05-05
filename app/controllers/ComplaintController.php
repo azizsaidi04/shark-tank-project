@@ -42,31 +42,92 @@ class ComplaintController extends Controller {
     
 
 
-    // Ajouter une réclamation
-    public function add() {
+    public function add(): void {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $title = htmlspecialchars($_POST['title']);
             $description = htmlspecialchars($_POST['description']);
-
-            // Server-side validation to check if title exceeds 7 words
+    
+            // Validation côté serveur : max 7 mots dans le titre
             $titleWords = explode(' ', $title);
             if (count($titleWords) > 7) {
-                // If title exceeds 7 words, show an error message
                 $error = "Le titre ne doit pas dépasser 7 mots.";
-                // Pass the error to the view
                 $this->view('frontoffice/add_complaint', ['error' => $error]);
-                return; // Stop further processing
+                return;
+            }
+    
+            // Vérification des propos avec Gemini
+            $fullText = $title . "\n" . $description;
+            $hasBadWords = $this->checkWithGemini($fullText);
+    
+            if ($hasBadWords) {
+                $error = "Votre réclamation contient des propos inappropriés.";
+                $this->view('frontoffice/add_complaint', ['error' => $error]);
+                return;
             }
 
-            if ($this->complaintModel->addComplaint($title, $description)) {
+            $complaintTopic = $this->generateTopicWithGemini($fullText);
+            
+    
+            // Ajout dans la base si tout est ok
+            if ($this->complaintModel->addComplaint($title, $description, $complaintTopic)) {
                 header('Location: ../public/index.php?action=index');
             } else {
                 echo "Erreur lors de l'ajout de la réclamation.";
             }
         }
+    
         $this->view('frontoffice/add_complaint');
     }
 
+    private function generateTopicWithGemini($text) {    
+        $prompt = "Je vais vous donner une réclamation d'un utilisateur de mon site et je veux que tu extrais le sujet de cette reclamation en un mot ou maximum 2 mots. Reponds par le sujet extracté seulement. Texte du reclamation : " . $text;
+    
+        $textResponse = $this->sendWithGemini($prompt);
+    
+        return $textResponse;
+    }
+
+
+    private function checkWithGemini($text) {
+        $prompt = "Est-ce que ce texte contient des insultes ou des propos offensants je veux que tu bloque juste ces mots \"blabla, flafla, plapla \" ? Réponds simplement par 'oui' ou 'non'. Texte : " . $text;
+
+        $textResponse = $this->sendWithGemini($prompt);
+    
+        return stripos($textResponse, 'oui') !== false;
+    }
+
+    private function sendWithGemini($prompt){
+        $apiKey = 'AIzaSyB_YOqTXipIBAogpStwHhNCTaE7Geq-TCg';  // Remplace par ta vraie clé API Gemini
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
+    
+    
+        $data = [
+            'contents' => [
+                ['parts' => [['text' => $prompt]]]
+            ]
+        ];
+    
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/json",
+                'method'  => 'POST',
+                'content' => json_encode($data),
+            ]
+        ];
+    
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+    
+        if ($result === FALSE) {
+            return false; // En cas d'erreur, laisser passer
+        }
+    
+        $response = json_decode($result, true);
+        $textResponse = $response['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        return $textResponse;
+    }
+    
+    
     // Modifier une réclamation
     public function edit($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -230,6 +291,21 @@ class ComplaintController extends Controller {
             echo "There are no replies yet.";
         }
     }
+
+    public function statistics()
+    {
+        $statsByTopic = $this->complaintModel->getComplaintsCountByTopic();
+        $statsByDate = $this->complaintModel->getComplaintsCountByDate();
+        $stats = $this->complaintModel->getStatistics();
+
+        $this->view('backoffice/complaints_statistics', [
+            'statsByTopic' => $statsByTopic,
+            'statsByDate' => $statsByDate,
+            'stats' => $stats
+        ]);
+    }
+    
+    
 
 
 }

@@ -67,20 +67,38 @@
             color: white;
         }
 
+        .closed-img-style {
+            transform: rotate(-20deg);
+            top: 5%;
+            right: 0;
+            width: 50%;
+        }
+
+        .waiting-img-style {
+            transform: rotate(-30deg);
+            top: 10%;
+            right: 0;
+            width: 50%;
+        }
+
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body class="bg-gray-100">
 <div class="flex h-screen">
     <!-- Sidebar -->
     <aside class="w-64 bg-white shadow-md">
-    <div class="p-6 text-2xl font-bold text-blue-600">Backoffice</div>
-    <nav class="space-y-2 px-6">
-        <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion users</a>
-        <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion categories</a>
-        <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion offres</a>
-        <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion speechs</a>
-        <a href="index.php?action=backoffice" class="block text-gray-700 hover:text-blue-500">Gestion Réclamations</a>
-        <a href="index.php?action=index" class="block text-gray-700 hover:text-blue-500">Frontoffice</a>
-      </nav>
+        <div class="p-6 text-2xl font-bold text-blue-600">Backoffice</div>
+        <nav class="space-y-2 px-6">
+            <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion users</a>
+            <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion categories</a>
+            <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion offres</a>
+            <a href="#" class="block text-gray-700 hover:text-blue-500">Gestion speechs</a>
+            <a href="index.php?action=statistics" class="block text-gray-700 hover:text-blue-500">Statistiques</a>
+            <a href="index.php?action=backoffice" class="block text-gray-700 hover:text-blue-500">Gestion Réclamations</a>
+            <a href="index.php?action=index" class="block text-gray-700 hover:text-blue-500">Frontoffice</a>
+        </nav>
     </aside>
 </body>

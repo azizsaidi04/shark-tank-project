@@ -42,10 +42,16 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <?php foreach ($complaints as $complaint): ?>
-                <div class="card p-6 rounded shadow w-full">
+                <div class="card p-6 rounded shadow w-full relative">
                     <h2 class="text-xl font-bold mb-2 text-[#2F1A4A]"><?= htmlspecialchars($complaint['title']) ?></h2>
                     <p class="mb-2 text-[#847C84]"><?= nl2br(htmlspecialchars($complaint['description'])) ?></p>
-                    <p class="text-sm text-[#A093AF]">Status: <?= htmlspecialchars($complaint['status']) ?></p>
+                    <p class="text-sm text-[#A093AF]">Topic: <b> <?= htmlspecialchars($complaint['topic']) ?> </b> </p>
+                    <?php if($complaint['status'] == 'Closed') : ?>
+                        <img src="closed.png" alt="closed complaint" class="absolute closed-img-style">
+                    <?php else : ?>
+                        <img src="waiting.png" alt="waiting complaint" class="absolute waiting-img-style">
+                    <?php endif; ?>
+
                     <p class="text-sm text-[#A093AF]"><?= htmlspecialchars($complaint['created_at']) ?></p>
                     <!-- Affichage des réponses -->
                     <?php 
