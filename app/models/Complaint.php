@@ -34,13 +34,14 @@ class Complaint {
     }
 
     // Modifier une réclamation
-    public function updateComplaint($id, $title, $description) {
-        $query = "UPDATE " . $this->table . " SET title = :title, description = :description WHERE id = :id";
+    public function updateComplaint($id, $title, $description, $complaintTopic) {
+        $query = "UPDATE " . $this->table . " SET title = :title, description = :description, topic = :topic WHERE id = :id";
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':title', $title);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':topic', $complaintTopic);
 
         if ($stmt->execute()) {
             return true;

@@ -144,8 +144,20 @@ class ComplaintController extends Controller {
                 return; // Stop further processing
             }
             
+            // Vérification des propos avec Gemini
+            $fullText = $title . "\n" . $description;
+            $hasBadWords = $this->checkWithGemini($fullText);
+    
+            if ($hasBadWords) {
+                $error = "Votre réclamation contient des propos inappropriés.";
+                $this->view('frontoffice/add_complaint', ['error' => $error]);
+                return;
+            }
+
+            $complaintTopic = $this->generateTopicWithGemini($fullText);
             
-            if ($this->complaintModel->updateComplaint($id, $title, $description)) {
+            
+            if ($this->complaintModel->updateComplaint($id, $title, $description, $complaintTopic)) {
                 header('Location: ../public/index.php?action=index');
             } else {
                 echo "Erreur lors de la modification de la réclamation.";
